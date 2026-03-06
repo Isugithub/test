@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Friend Tracker</title>
+</head>
+<body>
+    <h2>Click "Allow" to share your location</h2>
+    <p id="status">Waiting for GPS...</p>
+
+    <script>
+        const DB_URL = "https://friendtracker-130c3-default-rtdb.firebaseio.com/.json";
+
+        function sendLocation(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+
+            document.getElementById('status').innerHTML = "Location Sent: " + lat + ", " + lng;
+
+            // Sends data to your Firebase
+            fetch(DB_URL, {
+                method: 'PATCH',
+                body: JSON.stringify({ lat: lat, lng: lng })
+            });
+        }
+
+        function handleError(err) {
+            document.getElementById('status').innerHTML = "Error: " + err.message;
+        }
+
+        // This triggers the phone's GPS sensor
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(sendLocation, handleError, {
+                enableHighAccuracy: true
+            });
+        } else {
+            document.getElementById('status').innerHTML = "GPS not supported by this browser.";
+        }
+    </script>
+</body>
+</html>
